@@ -9,10 +9,14 @@ create table shows.tv_show(
     n_seasons integer,
     n_episodes integer);
 
+create index on shows.tv_show(title);
+
 create table shows.director(
     director_id serial primary key,
     first_name text not null,
     last_name text);
+
+create unique index on shows.director(first_name, last_name);
 
 create table shows.episode(
     episode_id serial primary key,
@@ -22,6 +26,8 @@ create table shows.episode(
     season integer not null
 );
 
+create index on shows.episode(show_id);
+
 create table shows.statistics(
     show_id serial primary key references shows.tv_show(show_id),
     imdb_rating float,
@@ -30,9 +36,13 @@ create table shows.statistics(
     check (rt_rating between 0 and 100)
 );
 
+create unique index on shows.statistics(show_id);
+
 create table shows.country(
     country_name text primary key
 );
+
+create unique index on shows.country(country_name);
 
 create table shows.company(
     company_id serial primary key,
@@ -40,12 +50,16 @@ create table shows.company(
     country_name text references shows.country(country_name)
 );
 
+create index on shows.company(company_name);
+
 create table shows.actor(
     actor_id serial primary key,
     first_name text not null,
     last_name text,
     country_name text references shows.country(country_name)
 );
+
+create unique index on shows.actor(first_name, last_name);
 
 alter table shows.tv_show add country_name text references shows.country(country_name);
 
@@ -57,6 +71,9 @@ create table shows.show_cast(
     actor_id serial references shows.actor(actor_id)
 );
 
+create index on shows.show_cast(show_id);
+create index on shows.show_cast(actor_id);
+
 create table shows.show_companies(
     id serial primary key,
     show_id serial references shows.tv_show(show_id),
@@ -65,10 +82,16 @@ create table shows.show_companies(
 
 alter table shows.show_companies rename to production_companies;
 
+create index on shows.production_companies(company_id);
+create index on shows.production_companies(show_id);
+
 create table shows.show_directors(
     id serial primary key,
     show_id serial references shows.tv_show(show_id),
     director_id serial references shows.director(director_id)
 );
+
+create index on shows.show_directors(director_id);
+create index on shows.show_directors(show_id);
 
 
